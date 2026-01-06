@@ -16,7 +16,7 @@ RUN npm install -g @angular/cli@11.2.19 \
 # Copiar el resto del código fuente
 COPY . .
 
-EXPOSE 3200
+EXPOSE 4200
 
 #CMD ["npm", "start"]
 CMD ["npm", "run", "start"]

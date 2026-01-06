@@ -1,0 +1,43 @@
+# =========================
+# Node / npm
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Angular
+# =========================
+dist/
+.angular/
+.cache/
+.tmp/
+
+# =========================
+# Docker
+# =========================
+*.log
+.env
+.env.*
+docker-compose.override.yml
+
+# =========================
+# IDEs / OS
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# =========================
+# Coverage / Tests
+# =========================
+coverage/
+
+# =========================
+# Build artifacts
+# =========================
+out/
