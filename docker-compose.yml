@@ -28,8 +28,6 @@ services:
       - NODE_ENV=development
     networks:
       - appnet
-  
-
 
 volumes:
   app_node_modules:
