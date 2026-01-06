@@ -1,5 +1,4 @@
-# template_web
-
-# Limpiar volumenes y compilar cotenedores
+# Compilar cotenedores
 
 docker-compose up --build
+
