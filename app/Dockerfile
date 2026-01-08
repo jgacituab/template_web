@@ -1,22 +1,11 @@
-FROM node:14
+FROM node:20-bullseye-slim
 
 WORKDIR /usr/src/app
 
-# Copiar solo los archivos de dependencias
 COPY package*.json ./
+RUN npm install
 
-RUN rm -rf node_modules package-lock.json
-
-# Instalar Angular CLI 11 y TypeScript compatible
-RUN npm install -g @angular/cli@11.2.19 \
-    && npm install typescript@~4.0.5 \
-    && npm install 
-    #&& npm install @types/leaflet@1.5.23 --save-dev
-
-# Copiar el resto del código fuente
 COPY . .
 
 EXPOSE 4200
-
-#CMD ["npm", "start"]
-CMD ["npm", "run", "start"]
+CMD ["npm","start","--","--host","0.0.0.0","--port","4200","--poll=2000"]

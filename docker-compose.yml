@@ -7,7 +7,7 @@ services:
       - "2000:3000"
     volumes:
       - ./api:/usr/src/app
-      # api_node_modules:/usr/src/app/node_modules
+      - api_node_modules:/usr/src/app/node_modules
     environment:
       - NODE_ENV=development
     networks:
@@ -23,7 +23,7 @@ services:
       - "3800:4200"
     volumes:
       - ./app:/usr/src/app
-      # app_node_modules:/usr/src/app/node_modules
+      - app_node_modules:/usr/src/app/node_modules
     environment:
       - NODE_ENV=development
     networks:
