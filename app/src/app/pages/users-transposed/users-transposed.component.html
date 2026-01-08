@@ -1,0 +1,175 @@
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title">
+      <h1>Usuarios</h1>
+      <div class="subtitle">{{ dataSource.filteredData.length }} resultados</div>
+    </div>
+
+    <mat-form-field appearance="outline" class="search">
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        [value]="query"
+        (input)="applyFilter(($any($event.target)).value)"
+        placeholder="Buscar por nombre, email, rol o estado" />
+      <button mat-icon-button matSuffix *ngIf="query" (click)="applyFilter('')" aria-label="Limpiar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+
+
+    <div class="header-actions" *ngIf="isMobile">
+      <button mat-stroked-button [matMenuTriggerFor]="sortMenu">
+        <mat-icon>sort</mat-icon>
+        Ordenar
+      </button>
+
+      <mat-menu #sortMenu="matMenu">
+        <button mat-menu-item (click)="setMobileSort('name','asc')">Nombre (A–Z)</button>
+        <button mat-menu-item (click)="setMobileSort('name','desc')">Nombre (Z–A)</button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="setMobileSort('email','asc')">Email (A–Z)</button>
+        <button mat-menu-item (click)="setMobileSort('email','desc')">Email (Z–A)</button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="setMobileSort('role','asc')">Rol (A–Z)</button>
+        <button mat-menu-item (click)="setMobileSort('role','desc')">Rol (Z–A)</button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="setMobileSort('status','asc')">Estado (A–Z)</button>
+        <button mat-menu-item (click)="setMobileSort('status','desc')">Estado (Z–A)</button>
+      </mat-menu>      
+    </div>
+
+    <div class="sort-indicator" *ngIf="isMobile">
+      Orden actual:
+      <strong>{{ sortState.field }}</strong>
+      <span>{{ sortState.dir === 'asc' ? '↑' : '↓' }}</span>
+    </div>
+    
+  </div>
+
+  <!-- MOBILE -->
+  <ng-container *ngIf="isMobile; else desktop">
+    <div class="cards">
+      <mat-card class="user-card" *ngFor="let u of mobileData">
+        <div class="card-top">
+          <div class="avatar" [matTooltip]="u.name">{{ initials(u.name) }}</div>
+
+          <div class="main">
+            <div class="name">{{ u.name }}</div>
+            <div class="email">{{ u.email }}</div>
+          </div>
+
+          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Acciones">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="view(u)">
+              <mat-icon>visibility</mat-icon>
+              <span>Ver</span>
+            </button>
+            <button mat-menu-item (click)="edit(u)">
+              <mat-icon>edit</mat-icon>
+              <span>Editar</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="remove(u)">
+              <mat-icon>delete</mat-icon>
+              <span>Eliminar</span>
+            </button>
+          </mat-menu>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="kv">
+          <div class="kv-row">
+            <span class="k">ID</span>
+            <span class="v mono">#{{ u.id }}</span>
+          </div>
+
+          <div class="kv-row">
+            <span class="k">Rol</span>
+            <span class="v">
+              <mat-chip [color]="roleChipColor(u.role)" selected>{{ u.role }}</mat-chip>
+            </span>
+          </div>
+
+          <div class="kv-row">
+            <span class="k">Estado</span>
+            <span class="v">
+              <mat-chip [color]="statusChipColor(u.status)" selected>{{ u.status }}</mat-chip>
+            </span>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </ng-container>
+
+  <!-- DESKTOP -->
+  <ng-template #desktop>
+    <div class="table-wrap mat-elevation-z1">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onDesktopSortChange($event)" class="full">
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Usuario</th>
+          <td mat-cell *matCellDef="let r">
+            <div class="cell-user">
+              <div class="avatar sm">{{ initials(r.name) }}</div>
+              <div>
+                <div class="name">{{ r.name }}</div>
+                <div class="email">{{ r.email }}</div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="email">Email</th>
+          <td mat-cell *matCellDef="let r" class="mono">{{ r.email }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="role">Rol</th>
+          <td mat-cell *matCellDef="let r">
+            <mat-chip [color]="roleChipColor(r.role)" selected>{{ r.role }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Estado</th>
+          <td mat-cell *matCellDef="let r">
+            <mat-chip [color]="statusChipColor(r.status)" selected>{{ r.status }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-h">Acciones</th>
+          <td mat-cell *matCellDef="let r" class="actions">
+            <button mat-icon-button (click)="view(r)" aria-label="Ver" matTooltip="Ver">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="edit(r)" aria-label="Editar" matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="remove(r)" aria-label="Eliminar" matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 25]"
+        [pageSize]="10"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </ng-template>
+
+</div>

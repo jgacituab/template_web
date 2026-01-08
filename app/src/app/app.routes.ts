@@ -53,6 +53,11 @@ export const routes: Routes = [
         path: 'utilities',
         loadChildren: () => import('./routes/utilities/utilities.routes').then(m => m.routes),
       },
+      {
+        path: 'users-transposed',
+        loadComponent: () => import('./pages/users-transposed/users-transposed.component')
+          .then(m => m.UsersTransposedComponent)
+      }
     ],
   },
   {
