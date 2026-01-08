@@ -55,8 +55,12 @@ export const routes: Routes = [
       },
       {
         path: 'users-transposed',
-        loadComponent: () => import('./pages/users-transposed/users-transposed.component')
-          .then(m => m.UsersTransposedComponent)
+        loadComponent: () => import('./pages/users-transposed/users-transposed.component').then(m => m.UsersTransposedComponent)
+      },
+      {
+        path: 'app-users',
+        loadComponent: () =>
+          import('./pages/users/users.component').then(m => m.UsersComponent),
       }
     ],
   },

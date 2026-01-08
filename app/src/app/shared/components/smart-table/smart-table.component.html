@@ -1,0 +1,144 @@
+<div class="page">
+  <div class="header">
+    <div>
+      <h2>{{ title }}</h2>
+      <small>{{ dataSource.filteredData.length }} registros</small>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            [value]="query"
+            (input)="applyFilter(($any($event.target)).value)"
+            [placeholder]="searchPlaceholder" />
+            <button mat-icon-button matSuffix *ngIf="query" (click)="applyFilter('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    
+    <!-- ✅ Botón ordenar: fila propia -->
+    <div class="header-actions" *ngIf="isMobile">
+      <button mat-stroked-button [matMenuTriggerFor]="sortMenu" class="sort-btn">
+        <mat-icon>sort</mat-icon>
+        Ordenar
+      </button>
+    </div>
+
+    <div class="sort-indicator" *ngIf="isMobile && sortState.field">
+      Orden actual: <strong>{{ sortLabel() }}</strong>{{ sortState.dir === 'asc' ? '↑' : '↓' }}
+    </div>
+
+    <mat-menu #sortMenu="matMenu">
+      <ng-container *ngFor="let c of columns">
+        <button *ngIf="c.sortable !== false && c.type !== 'actions'"
+                mat-menu-item
+                (click)="setMobileSort(c.key, 'asc')">
+          {{ c.header }} A–Z
+        </button>
+        <button *ngIf="c.sortable !== false && c.type !== 'actions'"
+                mat-menu-item
+                (click)="setMobileSort(c.key, 'desc')">
+          {{ c.header }} Z–A
+        </button>
+        <mat-divider></mat-divider>
+      </ng-container>
+    </mat-menu>
+  </div>
+
+  <!-- MOBILE -->
+  <div *ngIf="isMobile; else desktop" class="cards">
+    <mat-card *ngFor="let row of mobileData">
+      <div class="top">
+        <div class="avatar">{{ initials(getValue(columns[0], row)) }}</div>
+        <div class="main">
+          <div class="primary">{{ getValue(columns[0], row) }}</div>
+          <div class="secondary" *ngIf="columns[1]">{{ getValue(columns[1], row) }}</div>
+        </div>
+
+        <button *ngIf="visibleActions(row).length"
+                mat-icon-button
+                [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item
+                  *ngFor="let a of visibleActions(row)"
+                  (click)="a.onClick(row)">
+            <mat-icon>{{ a.icon }}</mat-icon>
+            {{ a.label }}
+          </button>
+        </mat-menu>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="kv">
+        <div *ngFor="let c of mobileColumns()" class="row">
+          <span class="k">{{ c.header }}</span>
+
+          <span class="v" [class.mono]="c.monospace">
+            <ng-container [ngSwitch]="c.type ?? 'text'">
+              <ng-container *ngSwitchCase="'chip'">
+                <mat-chip
+                  [color]="c.chipColor?.(getValue(c, row), row)"
+                  selected>
+                  {{ getValue(c, row) }}
+                </mat-chip>
+              </ng-container>
+
+              <ng-container *ngSwitchDefault>
+                {{ getValue(c, row) }}
+              </ng-container>
+            </ng-container>
+          </span>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- DESKTOP -->
+  <ng-template #desktop>
+    <table mat-table
+           matSort
+           (matSortChange)="onDesktopSort($event)"
+           [dataSource]="dataSource">
+
+      <ng-container *ngFor="let c of columns" [matColumnDef]="c.key">
+        <th mat-header-cell *matHeaderCellDef>
+        <ng-container *ngIf="c.sortable !== false && c.type !== 'actions'; else noSort">
+            <span [mat-sort-header]="c.key">{{ c.header }}</span>
+        </ng-container>
+
+        <ng-template #noSort>
+            {{ c.header }}
+        </ng-template>
+        </th>
+
+        <td mat-cell *matCellDef="let row">
+          <ng-container [ngSwitch]="c.type">
+            <mat-chip *ngSwitchCase="'chip'">{{ getValue(c, row) }}</mat-chip>
+
+            <ng-container *ngSwitchCase="'actions'">
+              <button mat-icon-button
+                      *ngFor="let a of visibleActions(row)"
+                      (click)="a.onClick(row)">
+                <mat-icon>{{ a.icon }}</mat-icon>
+              </button>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>
+              {{ getValue(c, row) }}
+            </ng-container>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5,10,25]" showFirstLastButtons />
+  </ng-template>
+</div>
